@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+	<head>
+  		<link href="stylesheets/d3.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="d3/d3.v3.js"></script>
+		<script type="text/javascript" src="d3/d3.v3.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"type="text/javascript" ></script>
+  		<meta charset="UTF-8">
+  		<title>Data Pipeline Project Byte 3 -- Visualization</title>
+	</head>
+	<body>
+		<p style="text-align: center; font: 30px courier, bold"> What do they come to study?</p>
+		<div style="float: left; width: 60%; margin-left: 80px; display: inline-block;" id="container">
+			<p style="font: 12px courier;"> Hint: hover over a point to view its specific percentage </p>
+			<div style="display: none;" id="displaypct"> Major: = </div>
+			<div style="float: left;" id="country"></div>
+			<div style="float: left; margin-left: 20px;" id="percentage100"></div>
+			<div style="float: left; margin-left: 20px;"id="lines"></div>
+			<div style="float: left; margin-left: 20px;" id="percentage0"></div>
+		</div>
+		<div style="width: 30%; float: left;" id="majors">
+			<p style="font: 20px courier;"> Majors (Click to focus):</p>
+		</div>
+		<div style="width: 30%; float: left;" id="years">
+			<p style="font: 20px courier;"> Years (Click to focus):</p>
+			<div id="2009-10"onClick='window.location.href="/visualization2/?year=0"' style='float: left; -moz-border-radius: 4px; border-radius: 4px; padding-top: 10px; margin: 10px 20px 0 0; height: 20px; width: 110px; background-color: #9FA0A1;'><p style='text-align: center; margin: 0;'> 2009-10</p></div>
+			<div id="2010-11" onClick='window.location.href="/visualization2/?year=1"' style='float: left; -moz-border-radius: 4px; border-radius: 4px; padding-top: 10px; background-color: #9FA0A1; margin: 10px 20px 0 0; height: 20px; width: 110px;'><p style='text-align: center; margin: 0;'>
+ 2010-11</p></div>
+			<div id="2011-12" onClick='window.location.href="/visualization2/?year=2"' style='float: left; -moz-border-radius: 4px; border-radius: 4px; padding-top: 10px; background-color: #9FA0A1; margin: 10px 20px 0 0; height: 20px; width: 110px;'><p style='text-align: center; margin: 0;'>
+ 2011-12</p></div>
+			<div id="2012-13" onClick='window.location.href="/visualization2/?year=3"' style='float: left; -moz-border-radius: 4px; border-radius: 4px; padding-top: 10px; background-color: #9FA0A1; margin: 10px 20px 0 0; height: 20px; width: 110px;'><p style='text-align: center; margin: 0;'>
+ 2012-13</p></div>
+			<div id="2013-14" onClick='window.location.href="/visualization2/?year=4"' style='float: left; -moz-border-radius: 4px; border-radius: 4px; padding-top: 10px; background-color: #9FA0A1; margin: 10px 20px 0 0; height: 20px; width: 110px;'><p style='text-align: center; margin: 0;'>
+ 2013-14</p></div>
+		</div>
+		<p style="clear: both; width: 80%; margin-left: 80px; font-size:20px; font-weight:bold;"> This chart shows what the foreign students for a given country are studying in terms of major. It displays the percentage of students from a certain country that are studying each major from the years 2009 - 2014.</p>
+		<p style="width: 80%; margin-left: 80px;"> Some of the interesting observations are: 1) Nearly 80% of Indian students come to study STEM subjeccts (Science, Technology, Engineering, and Math) 2) Students from European countries tend to have a much lesser bias in terms of major 3) From 2009-14, 25% or more of students from Saudi Arabia studied Intensive English, whereas most students from other countries didn't study Intensive English. In 2012-13, more Japanese students began to focus on Intensive English (14.6%). In 2013-14, students from Saudi Arabia, Brazil, Kuwait, and Japan studied Int ensive English a lot more than students from other countries.</p>
+		<p style="text-align: center;">Data Source 1: <a href="http://www.iie.org/Research-and-Publications/Open-Doors/Data/International-Students/Fields-of-Study-Place-of-Origin/2013-14/"> Institute of International Education(IIE)</a></p>
+		<script>
+			// ----------- EVERY CHART NEEDS DATA --------------
+			var countries = {{countries|safe}};
+			var percentages = {{percentages|safe}};
+			var majors = {{majors|safe}};
+			var current_year = {{current_year|safe}};
+
+			var year = "";
+			if (current_year == 0) {
+				year = "2009-10";
+			} else if (current_year == 1) {
+				year = "2010-11";
+			} else if (current_year == 2) {
+				year = "2011-12";
+			} else if (current_year == 3) {
+				year = "2012-13";
+			} else {
+				year = "2013-14";
+			}
+
+			$("#" + year).css("background-color", "#DFBA50");
+
+
+			var colors = ["#34A6B3", "#2D3A62", "#55375E", "#504964", "#6F697B", "#5A1227", "#E2607F", "#DDA6B1", "#E1965D", "#AE986F", "#D87C82", "#1EBBA6"]; 
+
+			var lineGraph = d3.select("#lines").append("svg")
+				.attr("width", 305)
+				.attr("height", 35*countries.length + 50);	
+			for (i = 0; i < countries.length; i ++) {
+				console.log(countries[i]);
+				$("#country").append("<p style='margin-bottom:20px; font: 12px courier;'>" + countries[i] + " , " + year + "</p>");
+				$("#percentage100").append("<p style='margin-bottom:20px; font: 12px courier;'> 100% </p>");
+				// add the line for percentages
+				console.log(countries[i]);
+				console.log(percentages[i]);
+				var newLine = lineGraph.append("line")
+					.attr("x1", 0)
+					.attr("y1", 18 + 33.5*i)
+					.attr("x2", 305)
+					.attr("y2", 18 + 33.5*i)
+					.attr("stroke-width", 2)
+					.attr("stroke", "grey");
+				// for each of the majors add a circle at the correct pct
+				for (j = 0; j < percentages[i].length; j++) {
+					var circle = lineGraph.append("circle")
+						.attr("r", 5)
+						.attr("cx", 300 - 3*(percentages[i][j]))
+						.attr("cy", 18 + 33.5*i)
+						.attr("fill", colors[j])
+						.attr("class", "c" + j)
+						.attr("id", "i" + i + "i" + j);
+					// When it is hovered over display the percentage for it
+					$("#i" + i + "i" + j).mouseover(function() {
+						var id = $(this).attr("id");
+						var pos = $(this).position();
+						var indices = id.split("i")
+						var c_index = parseInt(indices[1]);
+						var p_index = parseInt(indices[2]);
+						console.log(c_index + "," + p_index)
+						var percent = percentages[c_index][p_index];
+						$("#displaypct").text("Major: " + majors[p_index] + " = " + percent + "%");		
+						$("#displaypct").css({position: "absolute", top: pos.top - 20 + 'px', left: pos.left - 20 + 'px'});
+						$("#displaypct").show();
+					})
+					.mouseout(function() {
+						$("#displaypct").hide();
+					});
+				}
+				$("#percentage0").append("<p style='margin-bottom:20px; font: 12px courier;'> 0% </p>");
+			}
+
+			// labels/buttons for selecting a major to focus on
+
+			$("#majors").append("<div id='all' style='-moz-border-radius: 4px; border-radius: 4px;padding-top: 10px;, margin: 10px 20px 0 0; height: 35px; width: 110px; background-color: #9FA0A1;'><p style='text-align: center; margin: 0;'>All</p></div>");
+			
+			$("#all").click(function() {
+				var circles = d3.selectAll("circle");
+				circles.attr("opacity", 1.0);
+				for (c = 0; c < majors.length; c++) {
+					$(".label#" + c).css("background-color", colors[c]);
+				}
+			});
+
+			for (k = 0; k < majors.length; k++) {
+				$("#majors").append("<div class='label' id='" + k + "' style='float: left; padding-top: 10px; -moz-border-radius: 4px; border-radius: 4px;margin: 10px 20px 0 0; height: 35px; width:110px; background-color:" + colors[k] + ";'><p style=' text-align: center; color: #000000; margin: 0;'>" + majors[k] + "</p></div>");
+				$("#" + k).click(function() {
+					// give focus to the circle selected
+					var circles = d3.selectAll("circle");
+					var id = $(this).attr("id");
+					var theseCircles = d3.selectAll(".c" + id);
+					circles.attr("opacity", "0.05");
+					theseCircles.attr("opacity", "1.0");
+					// give focus to the div selected
+					$(".label").css("background-color", "#9FA0A1");
+					$(this).css("background-color", colors[id]);
+				});
+			}
+		</script>
+	</body>
+</html>

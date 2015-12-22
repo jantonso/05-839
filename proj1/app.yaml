@@ -1,0 +1,36 @@
+application: quantum-keep-88520
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /visualization3/stylesheets
+  static_dir: stylesheets
+
+- url: /js
+  static_dir: js
+
+- url: /img
+  static_dir: img
+
+- url: /data
+  static_dir: data
+  application_readable: true
+
+- url: /visualization3/d3
+  static_dir: d3
+
+- url: /visualization2/d3
+  static_dir: d3
+
+- url: /.*
+  script: main.application
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
+- name: jinja2
+  version: latest
+- name: numpy
+  version: latest

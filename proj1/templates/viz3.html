@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<head>
+  		<link href="stylesheets/d3.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="d3/d3.v3.js"></script>
+		<script type="text/javascript" src="d3/d3.v3.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"type="text/javascript" ></script>
+		<script src="http://bl.ocks.org/NPashaP/raw/a74faf20b492ad377312/3513ad985b2fa93ea35f2fc864cb30540c298171/uStates.js" type="text/javascript"></script>
+  		<meta charset="UTF-8">
+  		<title>Data Pipeline Project Byte 3 -- Visualization</title>
+	</head>
+	<body>
+		<div id="tooltip"></div>
+		<p style="text-align: center; font: 30px courier;"> Where do they study? </p>
+		<p style="font: 12px courier; margin-left: 40px;"> Hint: hover over a state to view the number of foreign students in that state </p>
+		<svg style="float: left;" width="75%" height="600" id="statesvg"></svg> 
+		<div style="width: 20%; margin-left: 40px; float: left;" id="mapstuff">
+            <p style="font: 20px courier;"> Years (Click to focus):</p>
+            <div id="2014" onClick='window.location.href="/visualization3/?mapyear=0"' style='float: left; -moz-border-radius: 4px; border-radius: 4px; padding-top: 10px; margin: 10px 20px 0 0; height: 20px; width: 110px; background-color: #9FA0A1;'><p style='text-align: center; margin: 0;'> 2014</p></div>
+            <div id="2013" onClick='window.location.href="/visualization3/?mapyear=1"' style='float: left; -moz-border-radius: 4px; border-radius: 4px; padding-top: 10px; background-color: #9FA0A1; margin: 10px 20px 0 0; height: 20px; width: 110px;'><p style='text-align: center; margin: 0;'>
+ 2013</p></div>
+            <div id="2012" onClick='window.location.href="/visualization3/?mapyear=2"' style='float: left; -moz-border-radius: 4px; border-radius: 4px; padding-top: 10px; background-color: #9FA0A1; margin: 10px 20px 0 0; height: 20px; width: 110px;'><p style='text-align: center; margin: 0;'>
+ 2012</p></div>
+            <div id="2011" onClick='window.location.href="/visualization3/?mapyear=3"' style='float: left; -moz-border-radius: 4px; border-radius: 4px; padding-top: 10px; background-color: #9FA0A1; margin: 10px 20px 0 0; height: 20px; width: 110px;'><p style='text-align: center; margin: 0;'>
+ 2011</p></div>
+            <div id="2010" onClick='window.location.href="/visualization3/?mapyear=4"' style='float: left; -moz-border-radius: 4px; border-radius: 4px; padding-top: 10px; background-color: #9FA0A1; margin: 10px 20px 0 0; height: 20px; width: 110px;'><p style='text-align: center; margin: 0;'>
+ 2010</p></div>
+			<div style="margin-top: 20px; float: left; width:100%;" id="mapreference"></div>
+		</div>
+		<p style="clear: both; width: 80%; margin-left: 40px; font-size:20px; font-weight:bold;"> This chart shows the number of foreign students attending universities in each state of the U.S. from the years 2010 - 2014.</p>
+		<p style="width: 80%; margin-left: 40px;"> Some of the interesting observations are: 1) Texas, New York, and California have substantially more foreign students than other states 2) The total number of foreign students grows constantly for the majority of the states from the years 2010-2014 </p>
+		<p style="text-align: center;">Data Source 1: <a href="http://www.iie.org/Research-and-Publications/Open-Doors/Data/Fact-Sheets-by-US-State"> Institute of International Education(IIE)</a></p>
+		<script>
+			// append a legend for the map
+			var color1 = d3.interpolate("#ffffcc", "#800026")(1000/50000)
+			var color2 = d3.interpolate("#ffffcc", "#800026")(5000/50000)
+			var color3 = d3.interpolate("#ffffcc", "#800026")(10000/50000)
+			var color4 = d3.interpolate("#ffffcc", "#800026")(25000/50000)
+			var color5 = d3.interpolate("#ffffcc", "#800026")(50000/50000)
+			var color6 = d3.interpolate("#ffffcc", "#800026")(100000/50000)
+			$("#mapreference").append("<div><div style='display: inline-block; float: left; width: 50px; height: 50px; background-color:" + color1 + "'></div><p style='float: left; margin-left: 20px; font: 15px courier;'> <= 1000 </p></div>");
+			$("#mapreference").append("<div style='margin-top: 60px; clear: left;'><div style='display: inline-block; float: left; width: 50px; height: 50px; background-color:" + color2 + "'></div><p style='float: left; font: 15px courier; margin-left: 20px;'> <= 5000 </p></div>");
+			$("#mapreference").append("<div style='margin-top: 120px; clear: left;'><div style='display: inline-block; float: left; width: 50px; height: 50px; background-color:" + color3 + "'></div><p style='display: inline-block; font: 15px courier; margin-left: 20px;'> <= 10000 </p></div>");
+			$("#mapreference").append("<div style='margin-top: 15px; clear: left;'><div style='display: inline-block; float: left; width: 50px; height: 50px; background-color:" + color4 + "'></div><p style='display: inline-block; font: 15px courier; margin-left: 20px;'> <= 25000 </p></div>");
+			$("#mapreference").append("<div style='margin-top: 15px; clear: left;'><div style='display: inline-block; float: left; width: 50px; height: 50px; background-color:" + color5 + "'></div><p style='display: inline-block; font: 15px courier; margin-left: 20px;'> <= 50000 </p></div>");
+			$("#mapreference").append("<div style='margin-top: 15px; clear: left;'><div style='display: inline-block; float: left; width: 50px; height: 50px; background-color:" + color6 + "'></div><p style='display: inline-block; font: 15px courier; margin-left: 20px;'> <= 100000 </p></div>");
+			
+			function tooltipHtml(n, d){	/* function to create html content string in tooltip div. */
+				return "<h4>"+n+"</h4><table>"+
+					"<tr><td>Number of Foreign Students:</td><td>"+(d.num)+"</td></tr>"+
+					"</table>";
+			}
+		
+			var state_nums = {{state_nums|safe}}
+			var map_year = {{map_year|safe}}
+
+			// highlight the current year that is being viewed
+			$("#" + map_year).css("background-color", "#DFBA50");
+	
+			var sampleData ={};	/* Sample random data. */
+	
+			var states = ["HI", "AK", "FL", "SC", "GA", "AL", "NC", "TN", "RI", "CT", "MA",
+            "ME", "NH", "VT", "NY", "NJ", "PA", "DE", "MD", "WV", "KY", "OH", 
+            "MI", "WY", "MT", "ID", "WA", "DC", "TX", "CA", "AZ", "NV", "UT", 
+            "CO", "NM", "OR", "ND", "SD", "NE", "IA", "MS", "IN", "IL", "MN", 
+            "WI", "MO", "AR", "OK", "KS", "LS", "VA"] 	
+	
+			states.forEach(function(d){ 
+					var num_foreigners = state_nums[states.indexOf(d)];
+					console.log(num_foreigners.replace(",", ""))
+					sampleData[d]={num: num_foreigners, color:d3.interpolate("#ffffcc", "#800026")(parseInt(num_foreigners.replace(",", ""))/50000)}; 
+				});
+			
+			/* draw states on id #statesvg */	
+			uStates.draw("#statesvg", sampleData, tooltipHtml);
+		</script>
+	</body>
+</html>
